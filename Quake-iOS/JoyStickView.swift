@@ -9,6 +9,12 @@ protocol JoystickDelegate: class {
 
 }
 
+protocol RightJoystickDelegate: class {
+    
+    func handleRightJoyStick(angle: CGFloat, displacement: CGFloat)
+    func handleRightJoyStickPosition(x: CGFloat, y: CGFloat)
+
+}
 
 /**
  Type definition for a function that will receive updates from the JoyStickView when the handle moves. Takes two
@@ -40,6 +46,9 @@ public typealias JoyStickViewMonitor = (_ angle: CGFloat, _ displacement: CGFloa
 public final class JoyStickView: UIView {
     
     var delegate: JoystickDelegate?
+    var rightDelegate: RightJoystickDelegate?
+    
+    public var rightJoyStick: Bool = false
     
     // override class var requiresConstraintBasedLayout: Bool { return true }
     
@@ -136,6 +145,7 @@ public final class JoyStickView: UIView {
         
         tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(resetFrame))
         tapGestureRecognizer!.numberOfTapsRequired = 2
+        tapGestureRecognizer!.delaysTouchesEnded = false
         addGestureRecognizer(tapGestureRecognizer!)
     }
     
@@ -309,7 +319,12 @@ public final class JoyStickView: UIView {
             //
             self.angle = newClampedDisplacement != 0.0 ? CGFloat(180.0 - newAngleRadians * 180.0 / Float.pi) : 0.0
             //            monitor?(angle, displacement)
-            self.delegate?.handleJoyStick(angle: angle, displacement: displacement)
+            if self.rightJoyStick {
+                self.rightDelegate?.handleRightJoyStick(angle: angle, displacement: displacement)
+            }
+            else {
+                self.delegate?.handleJoyStick(angle: angle, displacement: displacement)
+            }
             
             
 //            print("delta x: \(delta.dx) delta y: \(delta.dy)")
@@ -317,7 +332,12 @@ public final class JoyStickView: UIView {
             let new_x = (delta.dx / (radius * 2))
             let new_y = (delta.dy / (radius * 2)) * -1
 //            print("new_x: \(new_x) new_y: \(new_y)")
-            self.delegate?.handleJoyStickPosition(x: new_x, y: new_y)
+            if self.rightJoyStick {
+                self.rightDelegate?.handleRightJoyStickPosition(x: new_x, y: new_y)
+            }
+            else {
+                self.delegate?.handleJoyStickPosition(x: new_x, y: new_y)
+            }
         }
     }
 }

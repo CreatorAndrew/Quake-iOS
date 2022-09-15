@@ -708,8 +708,8 @@ void R_DrawAliasModel (entity_t *e)
 	VectorAdd (currententity->origin, clmodel->mins, mins);
 	VectorAdd (currententity->origin, clmodel->maxs, maxs);
 
-	if (R_CullBox (mins, maxs))
-		return;
+	/* if (R_CullBox (mins, maxs))
+		return; */
 
 
 	VectorCopy (currententity->origin, r_entorigin);
@@ -1213,10 +1213,10 @@ void R_SetupGL (void)
 			GL_Scale (gl_projection_matrix, 1.0, -1.0, 1.0);
 		else
 			GL_Scale (gl_projection_matrix, -1.0, 1.0, 1.0);
-		glCullFace(GL_BACK);
+		// glCullFace(GL_BACK);
 	}
-	else
-		glCullFace(GL_FRONT);
+	/* else
+		glCullFace(GL_FRONT); */
 
     GL_Identity (r_world_rotate_matrix);
 
@@ -1392,7 +1392,7 @@ void R_Mirror (void)
 		GL_Scale (gl_projection_matrix, 1.0, -1.0, 1.0);
 	else
 		GL_Scale (gl_projection_matrix, -1.0, 1.0, 1.0);
-	glCullFace(GL_FRONT);
+	// glCullFace(GL_FRONT);
 
     memcpy (r_world_rotate_matrix, r_base_world_rotate_matrix, sizeof(r_world_rotate_matrix));
     memcpy (r_world_translate_matrix, r_base_world_translate_matrix, sizeof(r_world_translate_matrix));

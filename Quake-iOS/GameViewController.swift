@@ -17,6 +17,10 @@ public var gameInterrupted : Bool = false
 
 public var startGame : Bool = false
 
+func applyJoystickCurve(position: CGFloat, range: CGFloat) -> Float {
+     return Float(pow(position / range, 2) * range * (position < 0 ? -1 : 1))
+}
+
 class GameViewController: GLKViewController, GLKViewControllerDelegate
 {
     var context: EAGLContext!
@@ -131,21 +135,41 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate
             joystick1.baseAlpha = 0.5 // let the background bleed thru the base
             joystick1.handleTintColor = UIColor.darkGray // Colorize the handle
             
-            let fireButton = UIButton(frame: CGRect(x: rect.width - 155, y: rect.height - 90, width: 75, height: 75))
+            let joystick2Frame = CGRect(origin: CGPoint(x: (rect.width - size.width - 50.0),
+                                                        y: (rect.height - size.height - 50.0)),
+                                        size: size)
+            let joystick2 = JoyStickView(frame: joystick2Frame)
+            joystick2.rightDelegate = self
+            joystick2.rightJoyStick = true
+            
+            view.addSubview(joystick2)
+            
+            joystick2.movable = false
+            joystick2.alpha = 0.5
+            joystick2.baseAlpha = 0.5 // let the background bleed thru the base
+            joystick2.handleTintColor = UIColor.darkGray // Colorize the handle
+            
+            let fireButton = UIButton(frame: CGRect(x: (rect.width - size.width - 125.0),
+                                                    y: (rect.height - size.height - 75.0),
+                                                    width: 75, height: 75))
             fireButton.setTitle("FIRE", for: .normal)
             fireButton.setBackgroundImage(UIImage(named: "JoyStickBase")!, for: .normal)
             fireButton.addTarget(self, action: #selector(firePressed), for: .touchDown)
             fireButton.addTarget(self, action: #selector(fireReleased), for: .touchUpInside)
             fireButton.alpha = 0.5
+            fireButton.titleLabel?.font = UIFont(name: "DpQuake", size: (fireButton.titleLabel?.font?.pointSize)!)
             
             view.addSubview(fireButton)
             
-            let jumpButton = UIButton(frame: CGRect(x: rect.width - 90, y: rect.height - 135, width: 75, height: 75))
+            let jumpButton = UIButton(frame: CGRect(x: (rect.width - size.width - 125.0),
+                                                    y: (rect.height - size.height - 0.0),
+                                                    width: 75, height: 75))
             jumpButton.setTitle("JUMP", for: .normal)
             jumpButton.setBackgroundImage(UIImage(named: "JoyStickBase")!, for: .normal)
             jumpButton.addTarget(self, action: #selector(jumpPressed), for: .touchDown)
             jumpButton.addTarget(self, action: #selector(jumpReleased), for: .touchUpInside)
             jumpButton.alpha = 0.5
+            jumpButton.titleLabel?.font = UIFont(name: "DpQuake", size: (jumpButton.titleLabel?.font?.pointSize)!)
             
             view.addSubview(jumpButton)
             
@@ -195,7 +219,7 @@ class GameViewController: GLKViewController, GLKViewControllerDelegate
             }
             
             gl_translation = (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
-            gl_projection = (0.839099705, 0.0, 0.0, 0.0, 0.0, 1.49173284, 0.0, 0.0, 0.0, 0.0, -1.00195503, -1.0, 0.0, 0.0, -8.00782013, 0.0)
+            gl_projection = (0.839099705, 0.0, 0.0, 0.0, 0.0, 1.42790992, 0.0, 0.0, 0.0, 0.0, -1.00195503, -1.0, 0.0, 0.0, -8.00782013, 0.0)
             
             frame_lapse = Float(controller.timeSinceLastUpdate)
             
@@ -404,10 +428,24 @@ extension GameViewController: JoystickDelegate {
     
     func handleJoyStickPosition(x: CGFloat, y: CGFloat) {
         in_sidestepmove = Float(y) // misnamed but whatever
-        in_rollangle = Float(x)
+        in_forwardmove = Float(x)
     }
     
     func handleJoyStick(angle: CGFloat, displacement: CGFloat) {
+//        print("angle: \(angle) displacement: \(displacement)")
+    }
+    
+}
+
+extension GameViewController: RightJoystickDelegate {
+    
+    func handleRightJoyStickPosition(x: CGFloat, y: CGFloat) {
+        let size = CGSize(width: 100.0, height: 100.0)
+        in_pitchangle = Float(applyJoystickCurve(position: -y, range: size.width/2) * 50)
+        in_rollangle = Float(applyJoystickCurve(position: x, range: size.width/2) * 50)
+    }
+    
+    func handleRightJoyStick(angle: CGFloat, displacement: CGFloat) {
 //        print("angle: \(angle) displacement: \(displacement)")
     }
     
