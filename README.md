@@ -6,7 +6,7 @@
 
 This is my port of Quake for iOS, running in modern resolutions including the full width of the iPhone X. I have also made a target and version for tvOS to run on Apple TV.
 
-![screenshot](https://raw.githubusercontent.com/tomkidd/Quake-iOS/master/ss_quake.png)
+![screenshot](https://github.com/CreatorAndrew/Quake-iOS/blob/main/ss_quake.png)
 
 Features
 
